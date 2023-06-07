@@ -31,9 +31,20 @@ public class Client implements ModInitializer {
             }
             api.resetDisconnect();
         }
+        if (api.getMultiplayerScreen()) {
+            try {
+                mc.setScreen(new MultiplayerScreen(new TitleScreen()));
+            } catch (Exception ignored) {
+            }
+            api.resetMultiplayerScreen();
+        }
     }
 
     public static API getAPI() {
         return api;
+    }
+
+    public static MinecraftClient getMc() {
+        return mc;
     }
 }

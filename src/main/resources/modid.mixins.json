@@ -8,6 +8,8 @@
   "client": [
     "MinecraftClientMixin",
     "MixinDirectConnect",
+    "MixinDisconnectScreen",
+    "MixinRespawnScreen",
     "MixinTitleScreen"
   ],
   "injectors": {

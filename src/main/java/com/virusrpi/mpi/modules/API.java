@@ -3,18 +3,25 @@ package com.virusrpi.mpi.modules;
 import static spark.Spark.*;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class API {
 	MinecraftClient mc;
 	String address;
 	boolean disconnect;
+	boolean multiplayerScreen;
+	Text reason;
 
 	public API(MinecraftClient mc) {
 		this.mc = mc;
 		address = "";
 		disconnect = false;
+		multiplayerScreen = false;
+		reason = Text.of("");
 
 		port(25567);
 
@@ -47,15 +54,6 @@ public class API {
 			return "OK";
 		});
 
-		get("/say", (request, response) -> {
-			String param = request.queryParams("param");
-
-			System.out.println("Saied: " + param);
-
-			response.status(200);
-			return "OK";
-		});
-
 		get("/disconnect", (request, response) ->  {
 			disconnect = true;
 			response.status(200);
@@ -71,10 +69,24 @@ public class API {
 			response.status(200);
 			return "OK";
 		});
+		get("/getDisconnectReason", (request, response) -> {
+			if (mc.currentScreen instanceof DisconnectedScreen) {
+				response.status(200);
+				return reason.getString();
+			} else {
+				response.status(400);
+				return "Not on a DisconnectedScreen";
+			}
+		});
+		get("/escapeDisconnect", (request, response) -> {
+			multiplayerScreen = true;
+			response.status(200);
+			return "OK";
+		});
+		get("/go", (request, response) -> {
+			String blocks = request.queryParams("blocks");
 
-		get("/pause", (request, response) ->  {
-			String p = request.queryParams("p");
-			mc.openPauseMenu(Boolean.parseBoolean(p));
+			goBlocks(mc.player, Integer.parseInt(blocks));
 
 			response.status(200);
 			return "OK";
@@ -91,5 +103,35 @@ public class API {
 
 	public void resetDisconnect(){
 		disconnect = false;
+	}
+	public boolean getMultiplayerScreen(){
+		return multiplayerScreen;
+	}
+	public void resetMultiplayerScreen(){
+		multiplayerScreen = false;
+	}
+
+	public void setReason(Text reason) {
+		this.reason = reason;
+	}
+
+
+	private void goBlocks(PlayerEntity player, int numBlocks) {
+		Vec3d playerPos = player.getPos();
+		Vec3d lookVector = player.getRotationVector();
+		for (int i = 0; i < numBlocks; i++) {
+			BlockPos blockPos = new BlockPos(
+					(int) (playerPos.x + (lookVector.x * (i + 1))),
+					(int) playerPos.y,
+					(int) (playerPos.z + (lookVector.z * (i + 1)))
+			);
+			if (player.world.getBlockState(blockPos).isAir()) {
+				player.teleport(playerPos.x + (lookVector.x * (i + 1)),
+						playerPos.y,
+						playerPos.z + (lookVector.z * (i + 1))
+				);
+				break;
+			}
+		}
 	}
 }
