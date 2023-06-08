@@ -6,7 +6,7 @@
   "name": "MPI",
   "description": "This is a Minecraft programming interface",
   "authors": [
-    "Me!"
+    "virusrpi"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
@@ -29,7 +29,7 @@
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric-api": "*",
-    "minecraft": "~1.19.4",
+    "minecraft": "~1.20",
     "java": ">=17"
   },
   "suggests": {
