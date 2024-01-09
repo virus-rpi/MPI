@@ -157,7 +157,7 @@ public class API {
 		});
 
 		get("/", (request, response) -> {
-			String disconnectMessage = "";
+			String disconnectMessage;
 			if (mc.currentScreen instanceof DisconnectedScreen) {
 				response.status(200);
 				disconnectMessage = reason.getString();
