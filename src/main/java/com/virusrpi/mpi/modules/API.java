@@ -1,10 +1,8 @@
 package com.virusrpi.mpi.modules;
 
-import static com.virusrpi.mpi.event.EventManager.eventBus;
 import static spark.Spark.*;
 
 import com.virusrpi.mpi.Client;
-import com.virusrpi.mpi.event.ConnectEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.text.Text;
@@ -13,6 +11,7 @@ public class API {
 	MinecraftClient mc;
 	String address;
 	boolean disconnect;
+	boolean connect;
 	boolean multiplayerScreen;
 	Text reason;
 
@@ -21,6 +20,7 @@ public class API {
 		address = "";
 		disconnect = false;
 		multiplayerScreen = false;
+		connect = false;
 		reason = Text.of("");
 
 		port(25567);
@@ -45,8 +45,7 @@ public class API {
 			}
 
 			address = ip + ":" + port;
-
-			eventBus.post(new ConnectEvent(address));
+			connect = true;
 
 			// mc.openPauseMenu(true);
 
@@ -125,4 +124,8 @@ public class API {
 	public void setReason(Text reason) {
 		this.reason = reason;
 	}
+
+	public boolean getConnect() { return connect; }
+
+	public void resetConnect() { connect = false; }
 }
