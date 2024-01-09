@@ -101,6 +101,23 @@ public class API {
 			response.status(200);
 			return "OK";
 		});
+		get("/setAutoRespawn", (request, response) -> {
+			String autoRespawnStr = request.queryParams("autoRespawn");
+			if (autoRespawnStr == null) {
+				response.status(400);
+				return "autoRespawn parameter is required.";
+			}
+			boolean autoRespawn;
+			try {
+				autoRespawn = Boolean.parseBoolean(autoRespawnStr);
+			} catch (NumberFormatException e) {
+				response.status(400);
+				return "Invalid autoRespawn value.";
+			}
+			Client.INSTANCE.setAutoRespawn(autoRespawn);
+			response.status(200);
+			return "OK";
+		});
 	}
 
 	public String getAddress(){

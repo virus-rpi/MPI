@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRespawnScreen {
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        assert Client.getMc().player != null;
-        Client.getMc().player.requestRespawn();
+        if (Client.INSTANCE.isAutoRespawn()) {
+            assert Client.getMc().player != null;
+            Client.getMc().player.requestRespawn();
+        }
     }
 }
