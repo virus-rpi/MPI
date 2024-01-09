@@ -23,7 +23,7 @@ public class Client implements ModInitializer {
 
     @Override
     public void onInitialize(){
-        logger.info("Startup...");
+        logger.info("Startup MPI...");
     }
 
     public void onTick(){

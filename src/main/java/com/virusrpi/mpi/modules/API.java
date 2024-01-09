@@ -1,11 +1,14 @@
 package com.virusrpi.mpi.modules;
 
+import static com.virusrpi.mpi.helper.StringToPacket.stringToPacket;
 import static spark.Spark.*;
-
 import com.virusrpi.mpi.Client;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
+
+import java.util.Objects;
 
 public class API {
 	MinecraftClient mc;
@@ -154,6 +157,18 @@ public class API {
 		get("/getCurrentAddress", (request, response) -> {
 			response.status(200);
 			return address.isEmpty() ? "Not connected" : address;
+		});
+
+		get("/sendPacket", (request, response) -> {
+			String packetString = request.queryParams("packet");
+			if (packetString == null) {
+				response.status(400);
+				return "packet parameter is required.";
+			}
+			Packet<?> packet = stringToPacket(packetString);
+			Objects.requireNonNull(Client.getMc().getNetworkHandler()).getConnection().send(packet);
+			response.status(200);
+			return "OK";
 		});
 
 		get("/", (request, response) -> {
