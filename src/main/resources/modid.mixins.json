@@ -9,8 +9,7 @@
     "MinecraftClientMixin",
     "MixinDirectConnect",
     "MixinDisconnectScreen",
-    "MixinRespawnScreen",
-    "MixinTitleScreen"
+    "MixinRespawnScreen"
   ],
   "injectors": {
     "defaultRequire": 1

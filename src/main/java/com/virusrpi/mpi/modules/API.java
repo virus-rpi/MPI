@@ -118,6 +118,23 @@ public class API {
 			response.status(200);
 			return "OK";
 		});
+		get("/setHeadless", (request, response) -> {
+			String headlessStr = request.queryParams("headless");
+			if (headlessStr == null) {
+				response.status(400);
+				return "headless parameter is required.";
+			}
+			boolean headless;
+			try {
+				headless = Boolean.parseBoolean(headlessStr);
+			} catch (NumberFormatException e) {
+				response.status(400);
+				return "Invalid headless value.";
+			}
+			Client.INSTANCE.setHeadless(headless);
+			response.status(200);
+			return "OK";
+		});
 	}
 
 	public String getAddress(){

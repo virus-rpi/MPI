@@ -1,6 +1,8 @@
 package com.virusrpi.mpi.mixin;
 
 import com.virusrpi.mpi.Client;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerInfo;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,9 +19,11 @@ public abstract class MixinDirectConnect  {
     @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(CallbackInfo ci) {
         if (Client.INSTANCE.isAutoReconnect() || Client.getAPI().getConnect()) {
-            if (Client.getMc().currentScreen instanceof MultiplayerScreen) {
-                connectTo(Client.getAPI().getAddress());
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.isMultiplayerEnabled()) {
+                MinecraftClient.getInstance().setScreen(new MultiplayerScreen(new TitleScreen()));
             }
+            connectTo(Client.getAPI().getAddress());
         }
     }
 
