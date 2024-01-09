@@ -4,16 +4,22 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.common.*;
 import net.minecraft.network.packet.c2s.config.ReadyC2SPacket;
 import net.minecraft.network.packet.c2s.handshake.HandshakeC2SPacket;
-import net.minecraft.network.packet.c2s.login.*;
+import net.minecraft.network.packet.c2s.login.EnterConfigurationC2SPacket;
+import net.minecraft.network.packet.c2s.login.LoginHelloC2SPacket;
+import net.minecraft.network.packet.c2s.login.LoginKeyC2SPacket;
+import net.minecraft.network.packet.c2s.login.LoginQueryResponseC2SPacket;
 import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.c2s.query.*;
+import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
+import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
 import net.minecraft.network.packet.s2c.common.*;
-import net.minecraft.network.packet.s2c.config.*;
+import net.minecraft.network.packet.s2c.config.DynamicRegistriesS2CPacket;
+import net.minecraft.network.packet.s2c.config.FeaturesS2CPacket;
+import net.minecraft.network.packet.s2c.config.ReadyS2CPacket;
 import net.minecraft.network.packet.s2c.login.*;
 import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.network.packet.s2c.query.*;
+import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
+import net.minecraft.network.packet.s2c.query.QueryResponseS2CPacket;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -220,7 +226,7 @@ public class StringToPacket {
         nameToPacket.put("QueryResponseS2CPacket", QueryResponseS2CPacket.class);
     }
 
-    public static Class<? extends Packet<?>> stringToPacket(String string) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Class<? extends Packet<?>> stringToPacket(String string) {
         return nameToPacket.get(string);
     }
 }
