@@ -7,3 +7,5 @@ The mod also hosts a web ui:
 
 
 The headless mode prevents rendering to increase performance.
+
+A better documentation and more functions are comming soon...
