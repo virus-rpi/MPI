@@ -135,6 +135,26 @@ public class API {
 			response.status(200);
 			return "OK";
 		});
+
+		get("/getAutoReconnect", (request, response) -> {
+			response.status(200);
+			return Client.INSTANCE.isAutoReconnect();
+		});
+
+		get("/getAutoRespawn", (request, response) -> {
+			response.status(200);
+			return Client.INSTANCE.isAutoRespawn();
+		});
+
+		get("/getHeadless", (request, response) -> {
+			response.status(200);
+			return Client.INSTANCE.isHeadless();
+		});
+
+		get("/", (request, response) -> {
+			response.status(200);
+			return generateHtml(Client.INSTANCE.isAutoReconnect(), Client.INSTANCE.isAutoRespawn(), Client.INSTANCE.isHeadless());
+		});
 	}
 
 	public String getAddress(){
@@ -162,4 +182,108 @@ public class API {
 	public boolean getConnect() { return connect; }
 
 	public void resetConnect() { connect = false; }
+
+	private String generateHtml(boolean autoReconnect, boolean autoRespawn, boolean headless) {
+		String autoReconnectColor = autoReconnect ? "green" : "red";
+		String autoRespawnColor = autoRespawn ? "green" : "red";
+		String headlessColor = headless ? "green" : "red";
+
+		String html = """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width">
+                    <meta http-equiv="refresh" content="5">
+                    <title>MPI WebUI</title>
+                    <style>
+                        body {
+                            font-family: sans-serif;
+                            background-color: #1e1e1e;
+                            color: #fff;
+                            padding: 0 20px;
+                        }
+                        h1 {
+                            text-align: center;
+                            font-size: 3em;
+                        }
+                        .circle {
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%%;
+                            margin: 10px;
+                            display: inline-block;
+                            vertical-align: middle;
+                        }
+                        .red {
+                            background-color: #ff0000;
+                        }
+                        .green {
+                            background-color: #00ff00;
+                        }
+                        button {
+                            display: inline-block;
+                            vertical-align: middle;
+                            background-color: #008CBA;
+                            border: none;
+                            color: white;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            font-size: 16px;
+                            padding: 12px 24px;
+                            margin: 6px 4px;
+                            cursor: pointer;
+                            border-radius: 10px;
+                        }
+                    </style>
+                    <script>
+                        function setAutoReconnect(autoReconnect) {
+                                fetch('/setAutoReconnect?autoReconnect=' + autoReconnect)
+                                .then(() => fetch('/getAutoReconnect'))
+                                .then(response => response.text())
+                                .then(autoReconnect => {
+                                    document.getElementById('autoReconnectCircle').className = autoReconnect === 'true' ? 'circle green' : 'circle red';
+                                });
+                            }
+				            
+                            function setAutoRespawn(autoRespawn) {
+                                fetch('/setAutoRespawn?autoRespawn=' + autoRespawn)
+                                .then(() => fetch('/getAutoRespawn'))
+                                .then(response => response.text())
+                                .then(autoRespawn => {
+                                    document.getElementById('autoRespawnCircle').className = autoRespawn === 'true' ? 'circle green' : 'circle red';
+                                });
+                            }
+				            
+                            function setHeadless(headless) {
+                                fetch('/setHeadless?headless=' + headless)
+                                .then(() => fetch('/getHeadless'))
+                                .then(response => response.text())
+                                .then(headless => {
+                                    document.getElementById('headlessCircle').className = headless === 'true' ? 'circle green' : 'circle red';
+                                });
+                            }
+                    </script>
+                </head>
+                <body>
+                    <h1>MPI WebUI</h1>
+                    <p>Auto reconnect:</p>
+                    <div id='autoReconnectCircle' class='circle %s'></div>
+                    <button onclick="setAutoReconnect(true)">On</button>
+                    <button onclick="setAutoReconnect(false)">Off</button>
+                    <p>Auto respawn:</p>
+                    <div id='autoRespawnCircle' class='circle %s'></div>
+                    <button onclick="setAutoRespawn(true)">On</button>
+                     <button onclick="setAutoRespawn(false)">Off</button>
+                     <p>Headless:</p>
+                     <div id='headlessCircle' class='circle %s'></div>
+                     <button onclick="setHeadless(true)">On</button>
+                     <button onclick="setHeadless(false)">Off</button>
+                </body>
+            </html>
+            """;
+
+		return String.format(html, autoReconnectColor, autoRespawnColor, headlessColor);
+	}
 }
