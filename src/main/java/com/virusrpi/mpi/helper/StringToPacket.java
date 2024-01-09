@@ -220,12 +220,7 @@ public class StringToPacket {
         nameToPacket.put("QueryResponseS2CPacket", QueryResponseS2CPacket.class);
     }
 
-    public static Packet<?> stringToPacket(String string) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Class<? extends Packet<?>> packetClass = nameToPacket.get(string);
-        if (packetClass == null) {
-            return null;
-        } else {
-            return packetClass.getDeclaredConstructor().newInstance();
-        }
+    public static Class<? extends Packet<?>> stringToPacket(String string) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return nameToPacket.get(string);
     }
 }
