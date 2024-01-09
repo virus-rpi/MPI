@@ -9,6 +9,7 @@
     "MinecraftClientMixin",
     "MixinDirectConnect",
     "MixinDisconnectScreen",
+    "MixinGameRenderer",
     "MixinRespawnScreen"
   ],
   "injectors": {
