@@ -17,6 +17,9 @@ public class Client implements ModInitializer {
     public static final MinecraftClient mc = MinecraftClient.getInstance();
     private final SENSORS sensor = new SENSORS(mc);
     private static final API api = new API(mc);
+    private boolean headless = true;
+    private boolean autoRespawn = true;
+    private boolean autoReconnect = true;
 
     @Override
     public void onInitialize(){
@@ -46,5 +49,29 @@ public class Client implements ModInitializer {
 
     public static MinecraftClient getMc() {
         return mc;
+    }
+
+    public boolean isHeadless() {
+        return headless;
+    }
+
+    public void setHeadless(boolean headless) {
+        this.headless = headless;
+    }
+
+    public boolean isAutoRespawn() {
+        return autoRespawn;
+    }
+
+    public void setAutoRespawn(boolean autoRespawn) {
+        this.autoRespawn = autoRespawn;
+    }
+
+    public boolean isAutoReconnect() {
+        return autoReconnect;
+    }
+
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
     }
 }

@@ -4,10 +4,7 @@ import static spark.Spark.*;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public class API {
 	MinecraftClient mc;
@@ -83,14 +80,6 @@ public class API {
 			response.status(200);
 			return "OK";
 		});
-		get("/go", (request, response) -> {
-			String blocks = request.queryParams("blocks");
-
-			goBlocks(mc.player, Integer.parseInt(blocks));
-
-			response.status(200);
-			return "OK";
-		});
 	}
 
 	public String getAddress(){
@@ -113,25 +102,5 @@ public class API {
 
 	public void setReason(Text reason) {
 		this.reason = reason;
-	}
-
-
-	private void goBlocks(PlayerEntity player, int numBlocks) {
-		Vec3d playerPos = player.getPos();
-		Vec3d lookVector = player.getRotationVector();
-		for (int i = 0; i < numBlocks; i++) {
-			BlockPos blockPos = new BlockPos(
-					(int) (playerPos.x + (lookVector.x * (i + 1))),
-					(int) playerPos.y,
-					(int) (playerPos.z + (lookVector.z * (i + 1)))
-			);
-			if (player.world.getBlockState(blockPos).isAir()) {
-				player.teleport(playerPos.x + (lookVector.x * (i + 1)),
-						playerPos.y,
-						playerPos.z + (lookVector.z * (i + 1))
-				);
-				break;
-			}
-		}
 	}
 }

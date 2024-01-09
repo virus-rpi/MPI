@@ -1,7 +1,10 @@
 package com.virusrpi.mpi.modules;
 
+import static com.virusrpi.mpi.event.EventManager.eventBus;
 import static spark.Spark.*;
 
+import com.virusrpi.mpi.Client;
+import com.virusrpi.mpi.event.ConnectEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.text.Text;
@@ -43,7 +46,9 @@ public class API {
 
 			address = ip + ":" + port;
 
-			mc.openPauseMenu(true);
+			eventBus.post(new ConnectEvent(address));
+
+			// mc.openPauseMenu(true);
 
 			System.out.println("Connection established to " + ip + ":" + port);
 
@@ -77,6 +82,23 @@ public class API {
 		});
 		get("/escapeDisconnect", (request, response) -> {
 			multiplayerScreen = true;
+			response.status(200);
+			return "OK";
+		});
+		get("/setAutoReconnect", (request, response) -> {
+			String autoReconnectStr = request.queryParams("autoReconnect");
+			if (autoReconnectStr == null) {
+				response.status(400);
+				return "autoReconnect parameter is required.";
+			}
+			boolean autoReconnect;
+			try {
+				autoReconnect = Boolean.parseBoolean(autoReconnectStr);
+			} catch (NumberFormatException e) {
+				response.status(400);
+				return "Invalid autoReconnect value.";
+			}
+			Client.INSTANCE.setAutoReconnect(autoReconnect);
 			response.status(200);
 			return "OK";
 		});
