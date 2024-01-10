@@ -1,20 +1,23 @@
 package com.virusrpi.mpi.modules;
 
-import static spark.Spark.*;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import com.virusrpi.mpi.Client;
 import com.virusrpi.mpi.helper.StringToPacket;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 
-import java.lang.reflect.Field;
-import java.util.Map;
+import java.util.Base64;
 import java.util.Objects;
+
+import static spark.Spark.get;
+import static spark.Spark.port;
+
+// TODO: Add endpoint to stream client into browser for remote control
+// TODO: Add endpoint to get incoming packets
+// TODO: Add endpoint to download loaded chunks
 
 public class API {
 	MinecraftClient mc;
@@ -168,47 +171,40 @@ public class API {
 		});
 
 		get("/sendPacket", (request, response) -> {
-	    	String packetString = request.queryParams("packet");
-	    	String argsString = request.queryParams("args");
-	    	if (packetString == null) {
-	    	    response.status(400);
-	    	    return "packet parameter is required.";
-	    	}
-	    	if (argsString == null) {
-	    	    response.status(400);
-	    	    return "args parameter is required.";
-	    	}
-	    	Map<String, Object> args;
-	    	try {
-	    	    args = new Gson().fromJson(argsString, new TypeToken<Map<String, Object>>(){}.getType());
-	    	} catch (JsonSyntaxException e) {
-	    	    response.status(400);
-	    	    return "Invalid args value.";
-	    	}
-	    	Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
-	    	if (packetClass == null) {
-	    	    response.status(400);
-	    	    return "Invalid packet name: " + packetString;
-	    	}
-	    	Packet<?> packet;
-	    	try {
-	    	    packet = packetClass.getConstructor().newInstance();
-	    	} catch (Exception e) {
-	    	    response.status(500);
-	    	    return "Error instantiating packet: " + e.getMessage();
-	    	}
-	    	for (Map.Entry<String, Object> entry : args.entrySet()) {
-	    	    try {
-	    	        Field field = packetClass.getField(entry.getKey());
-	    	        field.set(packet, entry.getValue());
-	    	    } catch (Exception e) {
-	    	        response.status(500);
-	    	        return "Error setting field value: " + e.getMessage();
-	    	    }
-	    	}
-	    	Objects.requireNonNull(Client.getMc().getNetworkHandler()).getConnection().send(packet);
-	    	response.status(200);
-	    	return "OK";
+		    String packetString = request.queryParams("packet");
+		    String bytesString = request.queryParams("bytes");
+		    if (packetString == null) {
+		        response.status(400);
+		        return "packet parameter is required.";
+		    }
+		    if (bytesString == null) {
+		        response.status(400);
+		        return "bytes parameter is required.";
+		    }
+		    byte[] bytes;
+		    try {
+		        bytes = Base64.getDecoder().decode(bytesString);
+		    } catch (IllegalArgumentException e) {
+		        response.status(400);
+		        return "Invalid bytes value.";
+		    }
+		    PacketByteBuf buf = new PacketByteBuf(Unpooled.wrappedBuffer(bytes));
+		    Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
+		    if (packetClass == null) {
+		        response.status(400);
+		        return "Invalid packet name: " + packetString + ".";
+		    }
+		    Packet<?> packet;
+		    try {
+		        packet = packetClass.getConstructor(PacketByteBuf.class).newInstance(buf);
+		    } catch (Exception e) {
+				e.printStackTrace();
+		        response.status(500);
+		        return "Error instantiating packet: " + e.getMessage();
+		    }
+		    Objects.requireNonNull(Client.getMc().getNetworkHandler()).getConnection().send(packet);
+		    response.status(200);
+		    return "OK";
 		});
 
 		get("/", (request, response) -> {
