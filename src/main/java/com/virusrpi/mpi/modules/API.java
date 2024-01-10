@@ -2,14 +2,13 @@ package com.virusrpi.mpi.modules;
 
 import com.virusrpi.mpi.Client;
 import com.virusrpi.mpi.helper.StringToPacket;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static spark.Spark.get;
@@ -27,6 +26,7 @@ public class API {
 	boolean multiplayerScreen;
 	Text reason;
 	StringToPacket stp;
+	ArrayList<Class<? extends Packet<?>>> packetsToSuppress;
 
 	public API(MinecraftClient mc) {
 		this.mc = mc;
@@ -36,6 +36,7 @@ public class API {
 		connect = false;
 		reason = Text.of("");
 		stp = new StringToPacket();
+		packetsToSuppress = new ArrayList<>();
 
 		port(25567);
 
@@ -170,41 +171,83 @@ public class API {
 			return address.isEmpty() ? "Not connected" : address;
 		});
 
-		get("/sendPacket", (request, response) -> {
-		    String packetString = request.queryParams("packet");
-		    String bytesString = request.queryParams("bytes");
-		    if (packetString == null) {
-		        response.status(400);
-		        return "packet parameter is required.";
-		    }
-		    if (bytesString == null) {
-		        response.status(400);
-		        return "bytes parameter is required.";
-		    }
-		    byte[] bytes;
-		    try {
-		        bytes = Base64.getDecoder().decode(bytesString);
-		    } catch (IllegalArgumentException e) {
-		        response.status(400);
-		        return "Invalid bytes value.";
-		    }
-		    PacketByteBuf buf = new PacketByteBuf(Unpooled.wrappedBuffer(bytes));
-		    Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
-		    if (packetClass == null) {
-		        response.status(400);
-		        return "Invalid packet name: " + packetString + ".";
-		    }
-		    Packet<?> packet;
-		    try {
-		        packet = packetClass.getConstructor(PacketByteBuf.class).newInstance(buf);
-		    } catch (Exception e) {
-				e.printStackTrace();
-		        response.status(500);
-		        return "Error instantiating packet: " + e.getMessage();
-		    }
-		    Objects.requireNonNull(Client.getMc().getNetworkHandler()).getConnection().send(packet);
-		    response.status(200);
-		    return "OK";
+		// get("/sendPacket", (request, response) -> {
+		//     String packetString = request.queryParams("packet");
+		//     String bytesString = request.queryParams("bytes");
+		//     if (packetString == null) {
+		//         response.status(400);
+		//         return "packet parameter is required.";
+		//     }
+		//     if (bytesString == null) {
+		//         response.status(400);
+		//         return "bytes parameter is required.";
+		//     }
+		//     byte[] bytes;
+		//     try {
+		//         bytes = Base64.getDecoder().decode(bytesString);
+		//     } catch (IllegalArgumentException e) {
+		//         response.status(400);
+		//         return "Invalid bytes value.";
+		//     }
+		//     PacketByteBuf buf = new PacketByteBuf(Unpooled.wrappedBuffer(bytes));
+		//     Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
+		//     if (packetClass == null) {
+		//         response.status(400);
+		//         return "Invalid packet name: " + packetString + ".";
+		//     }
+		//     Packet<?> packet;
+		//     try {
+		//         packet = packetClass.getConstructor(PacketByteBuf.class).newInstance(buf);
+		//     } catch (Exception e) {
+		// 		e.printStackTrace();
+		//         response.status(500);
+		//         return "Error instantiating packet: " + e.getMessage();
+		//     }
+		//     Objects.requireNonNull(Client.getMc().getNetworkHandler()).getConnection().send(packet);
+		//     response.status(200);
+		//     return "OK";
+		// });
+
+		get("/suppressPacket", (request, response) -> {
+			String packetString = request.queryParams("packet");
+			if (Objects.equals(packetString, "all")) {
+                packetsToSuppress.addAll(Arrays.asList(stp.getPacketClasses()));
+				response.status(200);
+				return "OK";
+			}
+			if (packetString == null) {
+				response.status(400);
+				return "packet parameter is required.";
+			}
+			Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
+			if (packetClass == null) {
+				response.status(400);
+				return "Invalid packet name: " + packetString + ".";
+			}
+			packetsToSuppress.add(packetClass);
+			response.status(200);
+			return "OK";
+		});
+
+		get("/unsuppressPacket", (request, response) -> {
+			String packetString = request.queryParams("packet");
+			if (Objects.equals(packetString, "all")) {
+				packetsToSuppress.clear();
+				response.status(200);
+				return "OK";
+			}
+			if (packetString == null) {
+				response.status(400);
+				return "packet parameter is required.";
+			}
+			Class<? extends Packet<?>> packetClass = stp.stringToPacket(packetString);
+			if (packetClass == null) {
+				response.status(400);
+				return "Invalid packet name: " + packetString + ".";
+			}
+			packetsToSuppress.remove(packetClass);
+			response.status(200);
+			return "OK";
 		});
 
 		get("/", (request, response) -> {
@@ -247,6 +290,10 @@ public class API {
 	public boolean getConnect() { return connect; }
 
 	public void resetConnect() { connect = false; }
+
+	public ArrayList<Class<? extends Packet<?>>> getPacketsToSuppress() {
+		return packetsToSuppress;
+	}
 
 	private String generateHtml(String address, String currentScreen, String disconnectReason, boolean autoReconnect, boolean autoRespawn, boolean headless) {
 		String autoReconnectColor = autoReconnect ? "green" : "red";

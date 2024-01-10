@@ -69,6 +69,7 @@ public class StringToPacket {
         nameToPacket.put("PlayerMoveC2SPacket.LookAndOnGround", PlayerMoveC2SPacket.LookAndOnGround.class);
         nameToPacket.put("PlayerMoveC2SPacket.OnGroundOnly", PlayerMoveC2SPacket.OnGroundOnly.class);
         nameToPacket.put("PlayerMoveC2SPacket.PositionAndOnGround", PlayerMoveC2SPacket.PositionAndOnGround.class);
+        nameToPacket.put("PlayerMoveC2SPacket", PlayerMoveC2SPacket.class);
         nameToPacket.put("PlayerSessionC2SPacket", PlayerSessionC2SPacket.class);
         nameToPacket.put("QueryBlockNbtC2SPacket", QueryBlockNbtC2SPacket.class);
         nameToPacket.put("QueryEntityNbtC2SPacket", QueryEntityNbtC2SPacket.class);
@@ -228,5 +229,13 @@ public class StringToPacket {
 
     public Class<? extends Packet<?>> stringToPacket(String string) {
         return nameToPacket.get(string);
+    }
+
+    public String[] getPacketNames() {
+        return nameToPacket.keySet().toArray(new String[0]);
+    }
+
+    public Class<? extends Packet<?>>[] getPacketClasses() {
+        return nameToPacket.values().toArray(new Class[0]);
     }
 }
