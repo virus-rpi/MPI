@@ -1,0 +1,50 @@
+body {
+    font-family: sans-serif;
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 0 20px 0 5%;
+    font-size: 1.5em;
+}
+h1 {
+    text-align: center;
+    font-size: 3em;
+}
+.circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.red {
+    background-color: #ff0000;
+}
+.green {
+    background-color: #00ff00;
+}
+button {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: #008CBA;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 12px 24px;
+    margin: 6px 4px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+input {
+    width: 200px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+.cursive {
+    font-style: italic;
+}

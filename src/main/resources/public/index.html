@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <title>MPI WebUI</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="script.js"></script>
+</head>
+<body>
+<h1>MPI WebUI</h1>
+
+<button onclick="refresh()">Refresh</button>
+<br/>
+
+<p>Current address: <span class="cursive" id="address">%s</span></p>
+<p>Current screen: <span class="cursive" id="screen">%s</span></p>
+<p>Current disconnect reason: <span class="cursive" id="disconnect_reason">%s</span></p>
+
+<p>Auto reconnect:</p>
+<div class='circle' id='autoReconnectCircle'></div>
+<button onclick="setAutoReconnect(true)">On</button>
+<button onclick="setAutoReconnect(false)">Off</button>
+
+<p>Auto respawn:</p>
+<div class='circle' id='autoRespawnCircle'></div>
+<button onclick="setAutoRespawn(true)">On</button>
+<button onclick="setAutoRespawn(false)">Off</button>
+
+<p>Headless:</p>
+<div class='circle' id='headlessCircle'></div>
+<button onclick="setHeadless(true)">On</button>
+<button onclick="setHeadless(false)">Off</button>
+
+<p>Connect:</p>
+<label for="ip"></label><input id="ip" placeholder="IP" type="text">
+<label for="port"></label><input id="port" placeholder="Port" type="text">
+<button onclick="connect()">Connect</button>
+
+<p>Disconnect:</p>
+<button onclick="disconnect()">Disconnect</button>
+
+<p>Escape Disconnect:</p>
+<button onclick="escapeDisconnect()">Escape Disconnect</button>
+
+<p>Suppress packet:</p>
+<details>
+    <summary>Packets</summary>
+    <label for="packetSearch"></label><input id="packetSearch" oninput="searchPackets()"
+                                             placeholder="Search for packets"
+                                             type="search">
+    <div id="packetList"></div>
+</details>
+</body>
+</html>
