@@ -97,7 +97,7 @@ function searchPackets() {
     }
 }
 
-function togglePacketSuppression(packet) {
+function togglePacketSuppression(packet) { // TODO: if packet is "all", update all buttons
     fetch('/isSuppressed?packet=' + packet)
         .then(response => response.text())
         .then(isSuppressed => {
