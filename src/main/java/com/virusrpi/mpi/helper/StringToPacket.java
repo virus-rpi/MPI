@@ -235,6 +235,7 @@ public class StringToPacket {
         return nameToPacket.keySet().toArray(new String[0]);
     }
 
+    @SuppressWarnings("unchecked")
     public Class<? extends Packet<?>>[] getPacketClasses() {
         return nameToPacket.values().toArray(new Class[0]);
     }
