@@ -5,17 +5,15 @@ import com.virusrpi.mpi.helper.StringToPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.text.Text;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-
 import static spark.Spark.*;
 
 // TODO: Add endpoint to stream client into browser for remote control
 // TODO: Add endpoint to get incoming packets
+// TODO: Add endpoint to get chat messages
 // TODO: Add endpoint to download loaded chunks
 
 public class API {
